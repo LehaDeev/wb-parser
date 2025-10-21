@@ -1,0 +1,8 @@
+# Virtual environment
+venv/
+.env
+*.pyc
+__pycache__/
+*.log
+logs/
+.DS_Store
