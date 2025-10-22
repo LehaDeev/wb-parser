@@ -95,12 +95,12 @@ class ResponseManager:
 
                     # Отправляем уведомление о КАЖДОМ новом ответе
                     review_data = {
-                        'user_name': result['review'].user_name,
-                        'rating': result['review'].rating,
-                        'product_name': result['review'].product_name,
-                        'text': result['review'].text,
-                        'time': datetime.now().strftime('%H:%M:%S')
-                    }
+                    'user_name': result['review'].user_name,
+                    'rating': result['review'].rating,
+                    'product_name': result['review'].product_name,
+                    'text': result['review'].review_text,
+                    'time': datetime.now().strftime('%H:%M:%S')
+                }
                     self.telegram.notify_new_review(review_data, result["reply"])
 
                 else:
