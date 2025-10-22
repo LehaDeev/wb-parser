@@ -32,7 +32,7 @@ class ReviewProcessor:
 
         for review in reviews:
             print(f"\n--- Обработка отзыва ---")
-            print(f"📄 Отзыв: {review.text[:100]}{'...' if len(review.text) > 100 else ''}")
+            print(f"📄 Отзыв: {review.review_text[:100]}{'...' if len(review.review_text) > 100 else ''}")
             print(f"⭐ Рейтинг: {review.rating}/5")
             print(f"👤 Имя: {review.user_name if review.user_name else 'Не указано'}")
 
@@ -42,12 +42,12 @@ class ReviewProcessor:
 
             # Генерируем ответ
             reply = self.ai_generator.generate_reply(
-                review.text,
-                review.product_name,
-                review.rating,
-                review.user_name,
-                review.pros,
-                review.cons
+                review_text=review.review_text,
+                product_name=review.product_name,
+                rating=review.rating,
+                user_name=review.user_name,
+                pros=review.pros,
+                cons=review.cons
             )
 
             if reply:

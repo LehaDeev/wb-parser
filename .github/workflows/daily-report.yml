@@ -2,7 +2,7 @@ name: Daily Wildberries Report
 
 on:
   schedule:
-    - cron: '0 9 * * *'  # Каждый день в 9:00 UTC (12:00 МСК)
+    - cron: '0 9 * * *'  # Каждый день в 10:00 UTC (13:00 МСК)
   workflow_dispatch:
 
 jobs:

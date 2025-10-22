@@ -80,7 +80,7 @@ class WBAPIClient:
 
         params = {
             "isAnswered": False,
-            "take": 20,
+            "take": 50,
             "skip": 0,
             "order": "dateDesc"
         }
@@ -94,8 +94,30 @@ class WBAPIClient:
         data = result.get("data", {})
         feedbacks_data = data.get("feedbacks", [])
 
-        reviews = [WBReview(item) for item in feedbacks_data if item.get('text')]
-        print(f"📥 Найдено {len(reviews)} неотвеченных отзывов")
+        # Детальная информация о полученных данных
+        print(f"📊 Получено сырых данных: {len(feedbacks_data)} отзывов")
+
+        # Выведем информацию о каждом отзыве
+        for i, feedback in enumerate(feedbacks_data):
+            has_text = bool(feedback.get('text', '').strip())
+            has_pros = bool(feedback.get('pros', '').strip())
+            is_answered = feedback.get('answered', True)
+            print(f"   {i+1}. ID: {feedback.get('id', 'N/A')}")
+            print(f"      Текст: {'✅ Есть' if has_text else '❌ Нет'}")
+            print(f"      Pros: {'✅ Есть' if has_pros else '❌ Нет'}")
+            print(f"      Отвечен: {'✅ Да' if is_answered else '❌ Нет'}")
+            print(f"      Рейтинг: {feedback.get('productValuation', 'N/A')}")
+            if has_text:
+                print(f"      Предпросмотр: {feedback.get('text', '')[:50]}...")
+            elif has_pros:
+                print(f"      Pros текст: {feedback.get('pros', '')[:50]}...")
+
+        # Фильтруем только отзывы с текстом ИЛИ pros
+        reviews = [WBReview(item) for item in feedbacks_data
+                  if (item.get('text') and len(item.get('text', '').strip()) > 3)
+                  or (item.get('pros') and len(item.get('pros', '').strip()) > 3)]
+
+        print(f"📥 После фильтрации: {len(reviews)} неотвеченных отзывов с текстом/pros")
         return reviews
 
     def post_reply_to_review(self, review_id: str, reply_text: str) -> bool:
@@ -125,14 +147,44 @@ class WBAPIClient:
     def get_unanswered_count(self) -> dict:
         """Получает количество неотвеченных отзывов"""
         if self.test_mode:
-            return {"countUnanswered": 2, "countUnansweredToday": 1, "valuation": "4.5"}
+            return {
+                "countUnanswered": 1,
+                "countUnansweredToday": 1,
+                "valuation": "4.5",
+                "feedbacksCount": 1,
+                "questionsCount": 0
+            }
 
-        result = self._make_request("GET", "feedbacks/count-unanswered")
+        try:
+            print("📊 Получение статистики...")
+            result = self._make_request("GET", "feedbacks/count-unanswered")
 
-        if result.get("error"):
-            return {}
+            if result.get("error"):
+                print(f"❌ Ошибка при получении статистики: {result.get('errorText')}")
+                return {
+                    "countUnanswered": 0,
+                    "countUnansweredToday": 0,
+                    "valuation": "N/A"
+                }
 
-        return result.get("data", {})
+            data = result.get("data", {})
+
+            # Логируем статистику
+            unanswered = data.get('countUnanswered', 0)
+            today = data.get('countUnansweredToday', 0)
+            valuation = data.get('valuation', 'N/A')
+
+            print(f"📊 Статистика получена: {unanswered} неотвеченных, {today} новых сегодня")
+
+            return data
+
+        except Exception as e:
+            print(f"⚠️ Ошибка получения статистики: {e}")
+            return {
+                "countUnanswered": 0,
+                "countUnansweredToday": 0,
+                "valuation": "N/A"
+            }
 
     def _get_test_reviews(self) -> List[WBReview]:
         """Возвращает тестовые отзывы"""
@@ -151,15 +203,15 @@ class WBAPIClient:
             },
             {
                 "id": "test_review_2",
-                "text": "Товар пришел с дефектом, очень расстроен.",
+                "text": "",
                 "productDetails": {"productName": "Тестовый товар 2"},
                 "createdDate": "2024-01-01",
                 "answered": False,
-                "productValuation": 2,
+                "productValuation": 5,
                 "wasViewed": True,
-                "pros": "",
-                "cons": "Дефект",
-                "userName": "Иван"
+                "pros": "Красивый сарафан, отличное качество",
+                "cons": "",
+                "userName": "Анастасия"
             }
         ]
         return [WBReview(item) for item in test_data]

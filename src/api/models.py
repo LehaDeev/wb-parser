@@ -23,4 +23,11 @@ class WBReview:
     @property
     def has_text(self) -> bool:
         """Проверяет, есть ли текст в отзыве"""
-        return bool(self.text and len(self.text.strip()) > 3)
+        # Используем pros как текст отзыва, если text пустой
+        actual_text = self.text if self.text else self.pros
+        return bool(actual_text and len(actual_text.strip()) > 3)
+
+    @property
+    def review_text(self) -> str:
+        """Возвращает текст отзыва (text или pros)"""
+        return self.text if self.text else self.pros

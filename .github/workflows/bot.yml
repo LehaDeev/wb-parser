@@ -2,7 +2,7 @@ name: Wildberries Feedback Bot
 
 on:
   schedule:
-    - cron: '*/30 * * * *'  # Каждые 30 минут
+    - cron: '0 10 * * *'    # ежедневно в 10:00 UTC (13:00 МСК)
   push:
     branches: [ main ]
   workflow_dispatch:  # Разрешить ручной запуск
