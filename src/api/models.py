@@ -1,3 +1,5 @@
+from typing import Dict, Any
+
 class WBReview:
     """Модель отзыва Wildberries"""
 
