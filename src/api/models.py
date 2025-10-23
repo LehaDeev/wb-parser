@@ -1,5 +1,3 @@
-from typing import Dict, Any
-
 class WBReview:
     """Модель отзыва Wildberries"""
 
@@ -22,12 +20,26 @@ class WBReview:
 
     @property
     def has_text(self) -> bool:
-        """Проверяет, есть ли текст в отзыве"""
-        # Используем pros как текст отзыва, если text пустой
-        actual_text = self.text if self.text else self.pros
-        return bool(actual_text and len(actual_text.strip()) > 3)
+        """Проверяет, есть ли текст в отзыве (text, pros или cons)"""
+        # Проверяем все возможные поля с текстом
+        has_main_text = bool(self.text and len(self.text.strip()) > 3)
+        has_pros = bool(self.pros and len(self.pros.strip()) > 3)
+        has_cons = bool(self.cons and len(self.cons.strip()) > 3)
+
+        return has_main_text or has_pros or has_cons
 
     @property
     def review_text(self) -> str:
-        """Возвращает текст отзыва (text или pros)"""
-        return self.text if self.text else self.pros
+        """Возвращает полный текст отзыва из всех доступных полей"""
+        parts = []
+
+        if self.text and self.text.strip():
+            parts.append(f"Отзыв: {self.text}")
+
+        if self.pros and self.pros.strip():
+            parts.append(f"Преимущества: {self.pros}")
+
+        if self.cons and self.cons.strip():
+            parts.append(f"Недостатки: {self.cons}")
+
+        return "\n".join(parts) if parts else "Текст отзыва отсутствует"

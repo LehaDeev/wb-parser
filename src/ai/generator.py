@@ -27,6 +27,23 @@ class AIGenerator:
                 self.generator = FallbackAIGenerator()
                 print("🔄 Используем локальные шаблоны")
 
-    def generate_reply(self, review_text, product_name="", rating=5, user_name="", pros="", cons=""):
-        """Генерирует ответ на отзыв"""
+    def generate_reply(self, review_text: str, product_name: str = "",
+                    rating: int = 5, user_name: str = "",
+                    pros: str = "", cons: str = "") -> str:
+        """Генерирует ответ на отзыв с учетом всех полей"""
+
+        # Если review_text уже содержит объединенные данные, используем как есть
+        # Иначе создаем полный текст из отдельных полей
+        if "Отзыв:" not in review_text and "Преимущества:" not in review_text:
+            full_review = []
+            if review_text.strip():
+                full_review.append(f"Отзыв: {review_text}")
+            if pros.strip():
+                full_review.append(f"Преимущества: {pros}")
+            if cons.strip():
+                full_review.append(f"Недостатки: {cons}")
+
+            if full_review:
+                review_text = "\n".join(full_review)
+
         return self.generator.generate_reply(review_text, product_name, rating, user_name, pros, cons)

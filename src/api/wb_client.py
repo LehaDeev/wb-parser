@@ -94,30 +94,37 @@ class WBAPIClient:
         data = result.get("data", {})
         feedbacks_data = data.get("feedbacks", [])
 
-        # Детальная информация о полученных данных
         print(f"📊 Получено сырых данных: {len(feedbacks_data)} отзывов")
 
-        # Выведем информацию о каждом отзыве
+        # Детальная информация о полученных данных
         for i, feedback in enumerate(feedbacks_data):
             has_text = bool(feedback.get('text', '').strip())
             has_pros = bool(feedback.get('pros', '').strip())
+            has_cons = bool(feedback.get('cons', '').strip())
             is_answered = feedback.get('answered', True)
+
             print(f"   {i+1}. ID: {feedback.get('id', 'N/A')}")
             print(f"      Текст: {'✅ Есть' if has_text else '❌ Нет'}")
             print(f"      Pros: {'✅ Есть' if has_pros else '❌ Нет'}")
+            print(f"      Cons: {'✅ Есть' if has_cons else '❌ Нет'}")
             print(f"      Отвечен: {'✅ Да' if is_answered else '❌ Нет'}")
             print(f"      Рейтинг: {feedback.get('productValuation', 'N/A')}")
+
+            # Показываем превью всех текстовых полей
             if has_text:
-                print(f"      Предпросмотр: {feedback.get('text', '')[:50]}...")
-            elif has_pros:
-                print(f"      Pros текст: {feedback.get('pros', '')[:50]}...")
+                print(f"      Текст: {feedback.get('text', '')[:50]}...")
+            if has_pros:
+                print(f"      Pros: {feedback.get('pros', '')[:50]}...")
+            if has_cons:
+                print(f"      Cons: {feedback.get('cons', '')[:50]}...")
 
-        # Фильтруем только отзывы с текстом ИЛИ pros
+        # Фильтруем отзывы с любым текстом (text, pros или cons)
         reviews = [WBReview(item) for item in feedbacks_data
-                  if (item.get('text') and len(item.get('text', '').strip()) > 3)
-                  or (item.get('pros') and len(item.get('pros', '').strip()) > 3)]
+                if (item.get('text') and len(item.get('text', '').strip()) > 3)
+                or (item.get('pros') and len(item.get('pros', '').strip()) > 3)
+                or (item.get('cons') and len(item.get('cons', '').strip()) > 3)]
 
-        print(f"📥 После фильтрации: {len(reviews)} неотвеченных отзывов с текстом/pros")
+        print(f"📥 После фильтрации: {len(reviews)} неотвеченных отзывов с текстом/pros/cons")
         return reviews
 
     def post_reply_to_review(self, review_id: str, reply_text: str) -> bool:

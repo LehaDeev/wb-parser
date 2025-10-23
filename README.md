@@ -202,8 +202,7 @@ text
 text
 wb_parser/
 ├── .github/workflows/          # GitHub Actions
-│   ├── bot.yml                 # Основной workflow
-│   └── daily-report.yml        # Ежедневные отчеты
+│   └── bot.yml                 # Основной workflow и ежедневные отчеты
 ├── src/
 │   ├── api/                    # API клиенты
 │   │   ├── wb_client.py        # Wildberries API

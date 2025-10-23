@@ -32,17 +32,25 @@ class ReviewProcessor:
 
         for review in reviews:
             print(f"\n--- Обработка отзыва ---")
-            print(f"📄 Отзыв: {review.review_text[:100]}{'...' if len(review.review_text) > 100 else ''}")
+            print(f"📄 Отзыв ID: {review.id}")
             print(f"⭐ Рейтинг: {review.rating}/5")
             print(f"👤 Имя: {review.user_name if review.user_name else 'Не указано'}")
+
+            # Детальная информация о текстовых полях
+            if review.text:
+                print(f"💬 Текст: {review.text[:100]}{'...' if len(review.text) > 100 else ''}")
+            if review.pros:
+                print(f"👍 Pros: {review.pros[:100]}{'...' if len(review.pros) > 100 else ''}")
+            if review.cons:
+                print(f"👎 Cons: {review.cons[:100]}{'...' if len(review.cons) > 100 else ''}")
 
             if not self.should_process(review):
                 print("⏭️ Пропускаем отзыв")
                 continue
 
-            # Генерируем ответ
+            # Генерируем ответ используя полный текст отзыва
             reply = self.ai_generator.generate_reply(
-                review_text=review.review_text,
+                review_text=review.review_text,  # Используем свойство которое объединяет все поля
                 product_name=review.product_name,
                 rating=review.rating,
                 user_name=review.user_name,
