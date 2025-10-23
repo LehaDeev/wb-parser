@@ -157,7 +157,7 @@ class WBAPIClient:
             return {
                 "countUnanswered": 1,
                 "countUnansweredToday": 1,
-                "valuation": "4.5",
+                "valuation": "4.5",  # Добавить тестовое значение
                 "feedbacksCount": 1,
                 "questionsCount": 0
             }
@@ -171,17 +171,15 @@ class WBAPIClient:
                 return {
                     "countUnanswered": 0,
                     "countUnansweredToday": 0,
-                    "valuation": "N/A"
+                    "valuation": "0.0"  # Заменить "N/A" на "0.0"
                 }
 
             data = result.get("data", {})
 
-            # Логируем статистику
-            unanswered = data.get('countUnanswered', 0)
-            today = data.get('countUnansweredToday', 0)
-            valuation = data.get('valuation', 'N/A')
-
-            print(f"📊 Статистика получена: {unanswered} неотвеченных, {today} новых сегодня")
+            # Обеспечиваем наличие всех полей
+            data.setdefault('valuation', '0.0')
+            data.setdefault('countUnanswered', 0)
+            data.setdefault('countUnansweredToday', 0)
 
             return data
 
@@ -190,7 +188,7 @@ class WBAPIClient:
             return {
                 "countUnanswered": 0,
                 "countUnansweredToday": 0,
-                "valuation": "N/A"
+                "valuation": "0.0"  # Заменить "N/A" на "0.0"
             }
 
     def _get_test_reviews(self) -> List[WBReview]:

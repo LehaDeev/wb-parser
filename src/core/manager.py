@@ -137,5 +137,5 @@ class ResponseManager:
 
     def __del__(self):
         """Деструктор - отправляет отчет при завершении"""
-        if not self.test_mode:
+        if not self.test_mode and self.daily_stats['checks_count'] > 0:
             self._send_daily_report()
