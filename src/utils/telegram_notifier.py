@@ -58,27 +58,45 @@ class TelegramNotifier:
 
         self.send_message(message)
 
-    def notify_daily_statistics(self, stats: dict):
-        """Ежедневная статистика"""
-        if not self.enabled:
-            return
+def notify_daily_statistics(self, stats: dict):
+    """Ежедневная статистика"""
+    if not self.enabled:
+        return
 
-        message = f"""
-📊 <b>Ежедневная статистика Wildberries Bot</b>
+    # Создаем более информативное сообщение
+    message_parts = [
+        "📊 <b>Ежедневная статистика Wildberries Bot</b>",
+        f"",
+        f"📅 <b>Дата:</b> {stats.get('date', '')}"
+    ]
 
-📅 <b>Дата:</b> {stats.get('date', '')}
-🔄 <b>Проверок за день:</b> {stats.get('checks_today', 0)}
-📝 <b>Обработано отзывов:</b> {stats.get('reviews_processed', 0)}
-📤 <b>Отправлено ответов:</b> {stats.get('replies_sent', 0)}
-⭐ <b>Текущая средняя оценка:</b> {stats.get('avg_rating', 'N/A')}
+    # Добавляем только доступную статистику
+    if stats.get('checks_today') != 'N/A':
+        message_parts.append(f"🔄 <b>Проверок за день:</b> {stats.get('checks_today', 0)}")
 
-📈 <b>Неотвеченных отзывов:</b> {stats.get('unanswered', 0)}
-📋 <b>Новых за сегодня:</b> {stats.get('new_today', 0)}
+    if stats.get('reviews_processed') != 'N/A':
+        message_parts.append(f"📝 <b>Обработано отзывов:</b> {stats.get('reviews_processed', 0)}")
 
-{'🎉 <b>Все отзывы обработаны!</b>' if stats.get('unanswered', 0) == 0 else '⚠️ <b>Есть неотвеченные отзывы</b>'}
-        """.strip()
+    if stats.get('replies_sent') != 'N/A':
+        message_parts.append(f"📤 <b>Отправлено ответов:</b> {stats.get('replies_sent', 0)}")
 
-        self.send_message(message)
+    # Обязательные поля из API WB
+    message_parts.extend([
+        f"⭐️ <b>Текущая средняя оценка:</b> {stats.get('avg_rating', 'N/A')}",
+        f"",
+        f"📈 <b>Неотвеченных отзывов:</b> {stats.get('unanswered', 0)}",
+        f"📋 <b>Новых за сегодня:</b> {stats.get('new_today', 0)}",
+        f""
+    ])
+
+    # Динамическое завершение
+    if stats.get('unanswered', 0) == 0:
+        message_parts.append("🎉 <b>Все отзывы обработаны!</b>")
+    else:
+        message_parts.append("⚠️ <b>Есть неотвеченные отзывы</b>")
+
+    message = "\n".join(message_parts)
+    self.send_message(message)
 
     def notify_error(self, error_message: str):
         """Уведомление об ошибке"""
